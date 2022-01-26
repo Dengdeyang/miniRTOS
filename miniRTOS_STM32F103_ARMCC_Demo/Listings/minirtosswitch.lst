@@ -1,0 +1,158 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         
+    2 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+    3 00000000                 THUMB
+    4 00000000                 REQUIRE8
+    5 00000000                 PRESERVE8
+    6 00000000         ;//---------------------------------PendSV中断服务�
+                       �数,任务上下文切换------------------------------
+                       ------//
+    7 00000000         ; NOTE: If use this file's HardFault_Handler, please com
+                       ments the HardFault_Handler code on other file.
+    8 00000000                 IMPORT           current_task_id
+    9 00000000                 IMPORT           next_task_id
+   10 00000000                 IMPORT           PSP_array
+   11 00000000                 EXPORT           PendSV_Handler
+   12 00000000         
+   13 00000000         PendSV_Handler
+                               PROC
+   14 00000000 F3EF 8210       MRS              R2,PRIMASK  ;
+   15 00000004 B672            CPSID            I           ;关中断
+   16 00000006 F3EF 8009       MRS              R0 , PSP    ;把PSP值读到R0
+   17 0000000A E920 0FF0       STMDB            R0!,{R4 - R11} ;R4~R11中的数
+                                                            据依次存入PSP�
+                                                            ��指地址处，�
+                                                            �存一次R0更新�
+                                                            ��址，记录PSP�
+                                                            �前值
+   18 0000000E 4908            LDR              R1,=current_task_id ;把C语言
+                                                            中全局变量curr
+                                                            ent_task_id的地�
+                                                            �存入R1，汇编�
+                                                            ��用C变量需用c
+                                                            pp函数
+   19 00000010 680C            LDR              R4,[R1]     ;将current_task_id
+                                                            数值存入R2中
+   20 00000012 4B08            LDR              R3, =PSP_array ;把C语言中�
+                                                            �局变量PSP_array
+                                                            的地址存入R1�
+                                                            �汇编调用C变�
+                                                            �需用cpp函数
+   21 00000014 F843 0024       STR              R0,[R3,R4,LSL #2] ;R0数据加�
+                                                            ��到地址=R3+R2<<
+                                                            2处(PSP当前地�
+                                                            �存到PSP_array+cu
+                                                            rrent_task_id*2处)
+                                                            
+   22 00000018         
+   23 00000018 4C07            LDR              R4,=next_task_id ;把C语言中
+                                                            全局变量next_ta
+                                                            sk_id的地址存�
+                                                            �R4，汇编调用C
+                                                            变量需用cpp函�
+                                                            ��
+   24 0000001A 6824            LDR              R4,[R4]     ;将next_task_id数
+                                                            值存入R4中
+   25 0000001C 600C            STR              R4,[R1]     ;将current_task_id
+                                                             = next_task_id
+   26 0000001E F853 0024       LDR              R0,[R3,R4,LSL #2] ;将地址=R3
+                                                            +R2<<2处数据加�
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            ��到R0，(PSP_arra
+                                                            y+next_task_id*2处
+                                                            数据加载到PSP�
+                                                            ��)
+   27 00000022 E8B0 0FF0       LDMIA            R0!,{R4 - R11} ;PSP所指地址
+                                                            处读出数据加�
+                                                            ��到R4~R11中，�
+                                                            �存一次R0更新�
+                                                            ��址，记录PSP�
+                                                            �前值
+   28 00000026 F380 8809       MSR              PSP,R0      ;R0所指地址加�
+                                                            ��到PSP
+   29 0000002A F382 8810       MSR              PRIMASK,R2
+   30 0000002E 4770            BX               LR          ;PC返回到LR所�
+                                                            �处，该函数调
+                                                            用前地址
+   31 00000030                 ALIGN            4           ;下一条指令或
+                                                            数据对齐到4字
+                                                            节地址处，空�
+                                                            ��补0
+   32 00000030                 ENDP
+   33 00000030                 END
+              00000000 
+              00000000 
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
+ork --depend=.\objects\minirtosswitch.d -o.\objects\minirtosswitch.o -IC:\Users
+\24668\Desktop\miniRTOS_STM32F103_ARMCC_Demo\RTE -IC:\software\MDK5\ARM\PACK\Ke
+il\STM32F1xx_DFP\2.3.0\Device\Include -IC:\software\MDK5\ARM\CMSIS\Include --pr
+edefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 521" --predefin
+e="STM32F10X_MD SETA 1" --list=.\listings\minirtosswitch.lst miniRTOS\Port\Src\
+ARMCC\miniRTOSswitch.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 2 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+   Uses
+      None
+Comment: .text unused
+PendSV_Handler 00000000
+
+Symbol: PendSV_Handler
+   Definitions
+      At line 13 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+   Uses
+      At line 11 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+Comment: PendSV_Handler used once
+2 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+PSP_array 00000000
+
+Symbol: PSP_array
+   Definitions
+      At line 10 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+   Uses
+      At line 20 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+Comment: PSP_array used once
+current_task_id 00000000
+
+Symbol: current_task_id
+   Definitions
+      At line 8 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+   Uses
+      At line 18 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+Comment: current_task_id used once
+next_task_id 00000000
+
+Symbol: next_task_id
+   Definitions
+      At line 9 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+   Uses
+      At line 23 in file miniRTOS\Port\Src\ARMCC\miniRTOSswitch.s
+Comment: next_task_id used once
+3 symbols
+340 symbols in table
