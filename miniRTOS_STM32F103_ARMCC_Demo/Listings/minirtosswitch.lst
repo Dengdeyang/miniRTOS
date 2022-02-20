@@ -96,11 +96,11 @@ ARM Macro Assembler    Page 2
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M3 --apcs=interw
 ork --depend=.\objects\minirtosswitch.d -o.\objects\minirtosswitch.o -IC:\Users
-\24668\Desktop\miniRTOS_STM32F103_ARMCC_Demo\RTE -IC:\software\MDK5\ARM\PACK\Ke
-il\STM32F1xx_DFP\2.3.0\Device\Include -IC:\software\MDK5\ARM\CMSIS\Include --pr
-edefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 521" --predefin
-e="STM32F10X_MD SETA 1" --list=.\listings\minirtosswitch.lst miniRTOS\Port\Src\
-ARMCC\miniRTOSswitch.s
+\24668\Desktop\miniRTOS\miniRTOS_STM32F103_ARMCC_Demo\RTE -IC:\software\MDK5\AR
+M\PACK\Keil\STM32F1xx_DFP\2.3.0\Device\Include -IC:\software\MDK5\ARM\CMSIS\Inc
+lude --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 521" -
+-predefine="STM32F10X_MD SETA 1" --list=.\listings\minirtosswitch.lst miniRTOS\
+Port\Src\ARMCC\miniRTOSswitch.s
 
 
 

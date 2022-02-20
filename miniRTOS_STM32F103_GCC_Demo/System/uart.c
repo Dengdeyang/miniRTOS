@@ -57,7 +57,6 @@ void USART1_Config(void)
 	
 	USART_Cmd(USART1, ENABLE);
 	NVIC_Configuration();
-	mini_printf("UART OK\r\n");
 }
 
 /// 重定向c库函数printf到USART1

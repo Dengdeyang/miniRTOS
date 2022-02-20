@@ -6,7 +6,6 @@
   * @brief   mini_libc,包含基本的string和memory相关操作函数和sprintf和printf函数的实现。
   ********************************************************************************/
 #include "mini_libc.h"
-#include "uart.h"
 #include "miniRTOSport.h"
 
 queue printf_buf;
@@ -300,12 +299,6 @@ char pull_queue(queue *data,char *pull_data,uint32 length)
 		}
 		return 1;
 	}
-}
-
-//--------------------------------------------------------------//
-void mini_sendchr(char ch)
-{  
-	UART_putch(ch);		
 }
 
 //--------------------------------------------------------------//

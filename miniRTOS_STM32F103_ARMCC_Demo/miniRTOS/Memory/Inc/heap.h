@@ -1,7 +1,6 @@
 #ifndef __HEAP_H
 #define	__HEAP_H
 
-#define HEAP_SIZE  4096
 #define ADDR_CRC(addr) (0x7FFFFFFF & (~((uint32)(addr))))
 #define Isolate_Zone_Flag  0xabcdef5a
 

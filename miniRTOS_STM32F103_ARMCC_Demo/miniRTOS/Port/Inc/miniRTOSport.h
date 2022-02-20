@@ -1,6 +1,8 @@
 #ifndef __MINIRTOSPORT_H
 #define	__MINIRTOSPORT_H
 
+#include "stm32f10x.h"
+#include "uart.h"
 #include "mini_libc.h"
 #include "kernel.h" 
 
@@ -8,8 +10,6 @@ typedef unsigned char  uint8;
 typedef unsigned short uint16;
 typedef unsigned int   uint32;
 #define NULL ((void *)0)
-
-#define stop_cpu          while(1)
 
 //断言
 #define vAssertCalled(char,int) mini_printf("Error:%s,%d\r\n",char,int)
@@ -25,5 +25,9 @@ void RTOS_Tick_IRQ(void);
 void Launch_Task_Schedule(void);
 void miniRTOS_Init(void);
 void Launch_Task_Schedule(void);
+void Idle_Task_Hook(void);
+void Disable_Interrupt(void);
+void Enable_Interrupt(void);
+void mini_sendchr(char ch);
 #endif 
 

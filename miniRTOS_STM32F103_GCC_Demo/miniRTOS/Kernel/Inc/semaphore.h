@@ -50,6 +50,7 @@ typedef  Queue_message* Queue_Handle;
 Queue_Handle Creat_queue(void);
 char QueueSend(Queue_message *queue,void *message,uint32 byteNum,uint32 delay_ms,MCU_mode mode);
 char QueueReceive(Queue_message *queue,void *message,uint32 byteNum,uint32 delay_ms,MCU_mode mode);
+void Semaphore_Creat(Semaphore_Type type,Semaphore_Handle *Semaphore,uint32 init_value);
 char Semaphore_Take(Semaphore_Type type,Semaphore_Handle *Semaphore,uint32 delay_ms,MCU_mode mode);
 void Semaphore_Give(Semaphore_Type type,Semaphore_Handle *Semaphore);
 #endif 

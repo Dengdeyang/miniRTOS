@@ -6,8 +6,8 @@
 
 //---------------------------------------------------------------------//
 #define MAX_DELAY         0xFFFFFFFF
-#define	TASK_NUM          (USER_TASK_NUM+2)   //system task number is 2: idle_task ,timer_guard_task
-#define Softimer_NUM      (USER_Softimer_NUM+2) //Softimer_NUM is USER_Softimer_NUM+ idle_softimer
+#define	TASK_NUM          (USER_TASK_NUM+3)   //system task number is 3: start_task,idle_task ,timer_guard_task
+#define Softimer_NUM      (USER_Softimer_NUM+1) //Softimer_NUM is USER_Softimer_NUM+ idle_softimer
 #define HW32_REG(ADDERSS) (*((volatile unsigned long *)(ADDERSS)))
 
 	
@@ -75,7 +75,7 @@ extern volatile uint32 SysTick_count;
 extern volatile uint32 current_task_id;
 extern volatile uint32 next_task_id;
 extern volatile Scheduler_state scheduler_pend_flag;
-extern Task_Handle idle_task;
+extern Task_Handle idle_task,start_task;
 extern Task_Unit *Timer_list_head;
 extern Task_Unit *Priority_list_head;
 
@@ -88,7 +88,7 @@ void Pend_Task(Task_Handle Task_x);
 void Pend_Schedule(void);
 void Release_Schedule(void);	
 void RTOS_Tick_IRQ(void);	
-
+void Start_task(void);
 uint8 Task_Create( 
 				uint16 *task_id,
 				char *task_name,

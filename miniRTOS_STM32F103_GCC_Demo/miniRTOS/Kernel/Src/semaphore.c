@@ -12,12 +12,12 @@
   *                             6)二值信号量释放函数会释放阻塞在当前信号量上的所有阻塞任务，用于同步
   ********************************************************************************/
 #include "semaphore.h" 
-#include "stm32f10x.h"
 #include "soft_timer.h"
 #include "stdlib.h"
 #include "mini_libc.h"
 #include "heap.h"
 #include "miniRTOSconfig.h"
+#include "miniRTOSport.h"
 #include "list.h" 
 
 #if miniRTOS_Semaphore
@@ -184,6 +184,27 @@ char QueueReceive(Queue_message *queue,void *message,uint32 byteNum,uint32 delay
 	}
 	Exit_Critical(irq_status);
 	return flag;
+}
+
+//-------------------------二值+互斥+计数信号量初始化函数-------------------------------------//
+/**
+ * @brief  初始化信号量(二值、互斥、计数)
+ * @param  
+			type：       操作信号量的种类
+            *Semaphore： 信号量地址
+ * @retval NO                   
+ */
+void Semaphore_Creat(Semaphore_Type type,Semaphore_Handle *Semaphore,uint32 init_value)
+{
+	if(type == Count_Semaphore)
+	{
+		Semaphore->Semaphore = init_value;
+	}
+	else
+	{
+		if(init_value != 0)  Semaphore->Semaphore = 1;
+		else                 Semaphore->Semaphore = 0;
+	}
 }
 
 //-------------------------二值+互斥+计数信号量Take函数-------------------------------------//

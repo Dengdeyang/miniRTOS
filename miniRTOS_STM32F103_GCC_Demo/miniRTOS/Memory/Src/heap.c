@@ -4,7 +4,7 @@
   * @version V0.2
   * @date    2021-04-29
   * @brief   动态内存管理
-  *1)定义的OS堆区为HEAP的数组，大小为HEAP_SIZE字节
+  *1)定义的OS堆区为HEAP的数组，大小为USER_HEAP_SIZE字节
   *2)堆空间使用前需要初始化内存信息块构成按地址从小到大排列的双链表和按空闲内存块从小打到排列的单链表
   *3)mini_printf_Double_List与mini_printf_Sole_List用于内存分析debug用
   *4)mini_free时会检查释放内存地址是否为之前mini_malloc的地址，释放的是否为busy块，此空间是否被上一个内存块非法踩踏
@@ -18,7 +18,8 @@
 #include "mini_libc.h"
 #include "heap.h"
 #include "kernel.h"
-uint8 HEAP[HEAP_SIZE]={0};
+#include "miniRTOSconfig.h"
+uint8 HEAP[USER_HEAP_SIZE]={0};
 
 MemoryInforBlockNode *DoubleListHead = NULL;
 MemoryInforBlockNode *SoleListHead = NULL;
@@ -26,8 +27,8 @@ MemoryInforBlockNode *SoleListHead = NULL;
 void HeapInit(void)
 {
 	MemoryInforBlockNode *temp = (MemoryInforBlockNode *) (((uint32)(&HEAP[7])) & (~0x00000007));//对Heap起始地址进行4字节地址对齐 
-	mini_memset(HEAP,0,HEAP_SIZE);
-	temp->MemoryBlockSize       = HEAP_SIZE - (uint32)temp + (uint32)HEAP - sizeof(MemoryInforBlockNode); 
+	mini_memset(HEAP,0,USER_HEAP_SIZE);
+	temp->MemoryBlockSize       = USER_HEAP_SIZE - (uint32)temp + (uint32)HEAP - sizeof(MemoryInforBlockNode); 
 	temp->MemoryBlockInfor.crc  = ADDR_CRC(temp);
     temp->MemoryBlockInfor.flag = FreeBlock;
 	temp->Isolate_Zone          = Isolate_Zone_Flag;//全FF隔离区

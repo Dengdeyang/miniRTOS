@@ -6,7 +6,7 @@
   * @brief   main文件完成硬件初始化，RTOS属性变量，任务函数，以及IPC通信中间件定义和初始化
   * @atteration   
   ********************************************************************************/
-#include "stm32f10x.h"
+#include "miniRTOSport.h"
 #include "led.h"
 #include "uart.h"
 #include "kernel.h"
@@ -50,10 +50,6 @@ int main(void)
 {	
     BSP_Init();
 	RTOS_Init();
-	while(1)
-	{
-		stop_cpu;
-	}
 }
 
 //-------------------------RTOS 消息队列、软件定时器、任务创建初始化-----------------------------------//
@@ -73,16 +69,6 @@ void Task_Creat_Init(void)
 
 
 //------------------------------RTOS 任务函数定义区---------------------------------//
-
-//---------------空闲任务----------------//
-void Idle_task(void)
-{
-	while(1)
-	{
-		mini_printf("Idle_task\r\n");
-		//__WFI();
-	}
-}
 
 void fault_test_by_div0(void) 
 {
@@ -108,9 +94,14 @@ void task1(void)
 		mini_printf("1111111111111111111111111111111\r\n");
 		switch(CMD)
 		{
-			case '1':
+			case '0':
 			{
 				fault_test_by_div0();
+				CMD = 0;
+			};break;
+
+			case '1':
+			{
 				Start_Soft_Timer(soft_timer0);
 				Start_Soft_Timer(soft_timer1);
 				mini_printf("Start_Soft_Timer\r\n");

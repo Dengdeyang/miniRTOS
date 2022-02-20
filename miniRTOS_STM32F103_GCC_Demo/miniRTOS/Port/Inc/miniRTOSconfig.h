@@ -4,6 +4,10 @@
 //----------------操作系统裁剪--------------------
 #define	USER_TASK_NUM        2     //用户指定任务数(不含空闲任务)
 
+#define USER_HEAP_SIZE       4096
+
+#define OS_Core_Clock       72000000 //Hz
+
 #define USER_Softimer_NUM    2     //用户指定软件定时器个数
 
 #define SysTick_Rhythm       1000  //用户指定操作系统心跳时钟周期，单位us

@@ -13,7 +13,6 @@
   *                             7)RTOS初始化函数
   * @atteration   启动文件.s中，堆区必须定义较大，在任务创建时，满足任务栈较大或任务数量较多时mini_malloc申请
   ********************************************************************************/
-#include "stm32f10x.h"
 #include "kernel.h" 
 #include "list.h" 
 #include "heap.h"
@@ -23,7 +22,7 @@ Task_Unit Task_List[TASK_NUM]={0};
 volatile uint32 PSP_array[TASK_NUM]; 
 Task_Unit *Timer_list_head;
 Task_Unit *Priority_list_head;
-Task_Handle idle_task;
+Task_Handle idle_task,start_task;
 
 volatile uint32 SysTick_count = 0;
 volatile uint32 current_task_id = 0;
@@ -32,7 +31,23 @@ volatile Scheduler_state scheduler_pend_flag = NO_Pend;
 
 void Idle_task(void);
 void Task_Creat_Init(void);
+void Start_task(void);
 
+#define miniRTOS_VERSION      1
+#define miniRTOS_MAINVERSION  0
+#define miniRTOS_SUBVERSION   0
+
+static void miniRTOS_Show_Vision(void)
+{
+	mini_printf("           /\\\r\n");
+	mini_printf("__________/  \\__________\r\n");
+	mini_printf("   ______/ /\\ \\______\r\n");
+	mini_printf("        / /  \\ \\\r\n");
+	mini_printf("       / /    \\ \\\r\n");	
+	mini_printf("  %d.%d.%d build %s\r\n",miniRTOS_VERSION,miniRTOS_MAINVERSION,miniRTOS_SUBVERSION, __DATE__);
+    mini_printf("2020 - 2023 Copyright by ddy\r\n");	
+    mini_printf("miniRTOS - mini Real Timer Operating System\r\n");
+}
 
 //---------------------------------RTOS 任务创建函数-----------------------------------------//
 /**
@@ -142,7 +157,10 @@ void RTOS_Tick_IRQ(void)
 	   (Task_List[current_task_id].task_state == TASK_READY) && \
 	   (Task_List[current_task_id].priority_list_next->task_priority == Task_List[current_task_id].task_priority))
 	{
-		List_insert(priority_list,&Task_List[current_task_id],reverse_insert);
+		if(((*Task_List[current_task_id].task_id_point) != start_task) && (((*Task_List[current_task_id].task_id_point) != idle_task)))
+		{
+			List_insert(priority_list,&Task_List[current_task_id],reverse_insert);
+		}
 	}
 
 	if(SysTick_count > Timer_list_head->task_delay_ms)
@@ -190,8 +208,8 @@ void RTOS_Init(void)
 {
 	uint16 i;
 	//*task_id,*task_name,task_state,task_priority,task_delay_ms,task_tick_count,task_stack_size_words,*task_function	
-	Task_Create(&idle_task,"Idle_task",TASK_READY,0,MAX_DELAY,MAX_DELAY,50,Idle_task);
-	
+	Task_Create(&start_task,"start_task",TASK_READY,0,MAX_DELAY,MAX_DELAY,50,Start_task);
+	Task_Create(&idle_task,"Idle_task",TASK_READY,0,MAX_DELAY,MAX_DELAY,100,Idle_task);
 	Task_Create(&timer_guard_task_id,"timer_guard_task",TASK_BLOCK,0xFFFF,0,MAX_DELAY,100,soft_timer_guard_task);
 	Task_Creat_Init();
 	
@@ -206,19 +224,36 @@ void RTOS_Init(void)
 		HW32_REG((PSP_array[i] + (14<<2))) = (unsigned long) Task_List[i].task_function;
 		HW32_REG((PSP_array[i] + (15<<2))) = 0x01000000;
 	}
-	
 	Task_list_init();
 	Softimer_List_init();
-	
-	//---------------初始化操作系统-------------------------------//
-    current_task_id = 0;
+	//--------------初始化操作系统-------------------------------//
+	Disable_Interrupt();
+	Pend_Schedule();
+	miniRTOS_Show_Vision();
+	current_task_id = start_task;
 	__set_PSP((PSP_array[current_task_id] + 16*4));
-	NVIC_SetPriority(PendSV_IRQn,0xFF);
-	NVIC_SetPriority(SVCall_IRQn,0);
-	SysTick_Config(SysTick_Rhythm*(SystemCoreClock/1000000));
-	__set_CONTROL(0x02);
-	Idle_task();
+    miniRTOS_Init();
 }
 
+//---------------启动任务----------------//
+void Start_task(void)
+{
+	Pend_Task(start_task);
+	Enable_Interrupt();
+	Release_Schedule();
+	while(1)
+	{
+		
+	}
+}
+
+//---------------空闲任务----------------//
+void Idle_task(void)
+{
+	while(1)
+	{
+		Idle_Task_Hook();
+	}
+}
 
 /*********************************************END OF FILE**********************/

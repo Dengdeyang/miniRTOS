@@ -59,16 +59,6 @@ void NMI_Handler(void)
   * @param  None
   * @retval None
   */
-void task_debug(void);
-void HardFault_Handler(void)
-{
-  //printf("HardFault_Handler\r\n");
-	task_debug();
-  while (1)
-  {
-	  
-  }
-}
 
 /**
   * @brief  This function handles Memory Manage exception.

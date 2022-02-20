@@ -5,6 +5,7 @@
 //---------------------------------PendSV中断服务函数,任务上下文切换------------------------------------//	
 .global PendSV_Handler
 .type PendSV_Handler, %function
+
 PendSV_Handler:
 	MRS R2,PRIMASK 
 	CPSID I       //关中断
@@ -23,7 +24,5 @@ PendSV_Handler:
 	MSR PSP,R0   //R0所指地址加载到PSP
 	MSR PRIMASK,R2 
 	BX LR       //PC返回到LR所指处，该函数调用前地址
-
-
 
 

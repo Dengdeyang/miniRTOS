@@ -6,7 +6,7 @@
   * @brief   main文件完成硬件初始化，RTOS属性变量，任务函数，以及IPC通信中间件定义和初始化
   * @atteration   
   ********************************************************************************/
-#include "stm32f10x.h"
+#include "miniRTOSport.h"
 #include "led.h"
 #include "uart.h"
 #include "kernel.h"
@@ -23,7 +23,7 @@ Task_Handle Task1,Task2;
 
 Soft_Timer_Handle soft_timer0,soft_timer1;                //软件定时器id
 
-Semaphore_Handle Binary_Semaphore1;                       //信号量定义(二值，计数，互斥)
+Semaphore_Handle Binary_Sem_test;                       //信号量定义(二值，计数，互斥)
 
 Queue_Handle Queue_test;                                  //消息队列定义
 
@@ -50,10 +50,6 @@ int main(void)
 {	
     BSP_Init();
 	RTOS_Init();
-	while(1)
-	{
-		stop_cpu;
-	}
 }
 
 //-------------------------RTOS 消息队列、软件定时器、任务创建初始化-----------------------------------//
@@ -62,27 +58,19 @@ void Task_Creat_Init(void)
 	Queue_test = Creat_queue();
 	if(Queue_test==NULL) mini_printf("Creat Queue Fail\r\n");
 	
+	Semaphore_Creat(Binary_Semaphore,&Binary_Sem_test,1);
+	
 	//*timer_id,timer_switch_flag,Timer_mode,timer_priority,user_tick_count,*timer_function
 	Soft_Timer_Creat(&soft_timer0,stop_timer,repeat_mode,1,500,Timer0_callback);
 	Soft_Timer_Creat(&soft_timer1,stop_timer,repeat_mode,2,1000,Timer1_callback);
 	
 	//*task_id,*task_name,task_state,task_priority,task_delay_ms,task_tick_ms,task_stack_size_words,*task_function
 	Task_Create(&Task1,"task1",TASK_READY,1,0,1000,100,task1);
-	Task_Create(&Task2,"task2",TASK_READY,1,0,1000,100,task2);
+	Task_Create(&Task2,"task2",TASK_READY,2,0,1000,100,task2);
 }
 
 
 //------------------------------RTOS 任务函数定义区---------------------------------//
-
-//---------------空闲任务----------------//
-void Idle_task(void)
-{
-	while(1)
-	{
-		//mini_printf("Idle_task\r\n");
-		//__WFI();
-	}
-}
 
 void fault_test_by_div0(void) 
 {
@@ -102,15 +90,20 @@ void task1(void)
 {
 	u8 tx_buffer = 0,rx_buffer = 0;
 	Device_Handle led=NULL;
-	float x2;
+	float x2=0;
 	while(1)
 	{
 		mini_printf("1111111111111111111111111111111\r\n");
 		switch(CMD)
 		{
-			case '1':
+			case '0':
 			{
 				fault_test_by_div0();
+				CMD = 0;
+			};break;
+
+			case '1':
+			{
 				Start_Soft_Timer(soft_timer0);
 				Start_Soft_Timer(soft_timer1);
 				mini_printf("Start_Soft_Timer\r\n");
@@ -182,7 +175,7 @@ void task1(void)
 			
 			case '9':
 			{
-				if(Semaphore_Take(Binary_Semaphore,&Binary_Semaphore1,5000,User_mode))            mini_printf("Task5 Semaphore1 Take OK \r\n");
+				if(Semaphore_Take(Binary_Semaphore,&Binary_Sem_test,5000,User_mode))            mini_printf("Task5 Semaphore1 Take OK \r\n");
 				else                                                      					  mini_printf("Task5 Semaphore1 Take Fail \r\n");
 				mini_printf("Task5 解除阻塞 \r\n");
 				CMD = 0;
@@ -224,7 +217,7 @@ void task2(void)
 			
 			case 'd':
 			{
-				Semaphore_Give(Binary_Semaphore,&Binary_Semaphore1);
+				Semaphore_Give(Binary_Semaphore,&Binary_Sem_test);
 				CMD = 0;
 			};break;
 			
